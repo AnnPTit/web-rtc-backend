@@ -1,0 +1,184 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-insert-sample-users
+      author: copilot
+      comment: "Insert sample data - Password for all users: password123"
+      changes:
+        # GIẢNG VIÊN (LECTURER)
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: $2a$10$rDkPvvAFV8kqwvKJzwlCv.tsmFSgPqcMx/nt0IKeaHwf0cKzljyVi
+              - column:
+                  name: full_name
+                  value: Administrator
+              - column:
+                  name: email
+                  value: admin@university.edu.vn
+              - column:
+                  name: role
+                  value: LECTURER
+              - column:
+                  name: created_at
+                  valueComputed: NOW()
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: nguyenvana
+              - column:
+                  name: password
+                  value: $2a$10$rDkPvvAFV8kqwvKJzwlCv.tsmFSgPqcMx/nt0IKeaHwf0cKzljyVi
+              - column:
+                  name: full_name
+                  value: Nguyen Van A
+              - column:
+                  name: email
+                  value: nguyenvana@university.edu.vn
+              - column:
+                  name: role
+                  value: LECTURER
+              - column:
+                  name: created_at
+                  valueComputed: NOW()
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: tranthib
+              - column:
+                  name: password
+                  value: $2a$10$rDkPvvAFV8kqwvKJzwlCv.tsmFSgPqcMx/nt0IKeaHwf0cKzljyVi
+              - column:
+                  name: full_name
+                  value: Tran Thi B
+              - column:
+                  name: email
+                  value: tranthib@university.edu.vn
+              - column:
+                  name: role
+                  value: LECTURER
+              - column:
+                  name: created_at
+                  valueComputed: NOW()
+
+        # HOC VIEN (STUDENT)
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: hoangvane
+              - column:
+                  name: password
+                  value: $2a$10$rDkPvvAFV8kqwvKJzwlCv.tsmFSgPqcMx/nt0IKeaHwf0cKzljyVi
+              - column:
+                  name: full_name
+                  value: Hoang Van E
+              - column:
+                  name: email
+                  value: hoangvane@student.edu.vn
+              - column:
+                  name: role
+                  value: STUDENT
+              - column:
+                  name: created_at
+                  valueComputed: NOW()
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: vuthif
+              - column:
+                  name: password
+                  value: $2a$10$rDkPvvAFV8kqwvKJzwlCv.tsmFSgPqcMx/nt0IKeaHwf0cKzljyVi
+              - column:
+                  name: full_name
+                  value: Vu Thi F
+              - column:
+                  name: email
+                  value: vuthif@student.edu.vn
+              - column:
+                  name: role
+                  value: STUDENT
+              - column:
+                  name: created_at
+                  valueComputed: NOW()
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: dovang
+              - column:
+                  name: password
+                  value: $2a$10$rDkPvvAFV8kqwvKJzwlCv.tsmFSgPqcMx/nt0IKeaHwf0cKzljyVi
+              - column:
+                  name: full_name
+                  value: Do Van G
+              - column:
+                  name: email
+                  value: dovang@student.edu.vn
+              - column:
+                  name: role
+                  value: STUDENT
+              - column:
+                  name: created_at
+                  valueComputed: NOW()
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: ngothih
+              - column:
+                  name: password
+                  value: $2a$10$rDkPvvAFV8kqwvKJzwlCv.tsmFSgPqcMx/nt0IKeaHwf0cKzljyVi
+              - column:
+                  name: full_name
+                  value: Ngo Thi H
+              - column:
+                  name: email
+                  value: ngothih@student.edu.vn
+              - column:
+                  name: role
+                  value: STUDENT
+              - column:
+                  name: created_at
+                  valueComputed: NOW()
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: dinhvani
+              - column:
+                  name: password
+                  value: $2a$10$rDkPvvAFV8kqwvKJzwlCv.tsmFSgPqcMx/nt0IKeaHwf0cKzljyVi
+              - column:
+                  name: full_name
+                  value: Dinh Van I
+              - column:
+                  name: email
+                  value: dinhvani@student.edu.vn
+              - column:
+                  name: role
+                  value: STUDENT
+              - column:
+                  name: created_at
+                  valueComputed: NOW()
+
