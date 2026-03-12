@@ -5,5 +5,8 @@ databaseChangeLog:
   - include:
       file: changes/002-insert-sample-users.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/003-create-videos.yaml
+      relativeToChangelogFile: true
 
 

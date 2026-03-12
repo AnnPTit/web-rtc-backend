@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-videos
+      author: copilot
+      changes:
+        - createTable:
+            tableName: videos
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: course_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: original_file_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: object_key
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: video_url
+                  type: VARCHAR(1000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_size
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: upload_time
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: videos
+            indexName: idx_videos_course_lesson
+            columns:
+              - column:
+                  name: course_id
+              - column:
+                  name: lesson_id
