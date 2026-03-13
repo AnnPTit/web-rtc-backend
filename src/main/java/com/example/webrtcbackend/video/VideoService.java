@@ -51,33 +51,46 @@ public class VideoService {
     }
 
     public PresignResponse createPresignedUrl(PresignRequest request) {
+
         validateFilename(request.getFileName());
+
         if (request.getFileSize() != null && request.getFileSize() > MAX_FILE_SIZE) {
             throw new ResponseStatusException(BAD_REQUEST, "file size exceeds limit");
         }
 
         String uuid = UUID.randomUUID().toString();
-        String objectKey = String.format("videos/%d/%d/%s-%s",
-                request.getCourseId(), request.getLessonId(), uuid, request.getFileName());
 
-        String ext = getExtension(request.getFileName());
-        String contentType = "video/" + ext;
+        String safeName = request.getFileName()
+                .replaceAll("\\s+", "_")
+                .replaceAll("[^a-zA-Z0-9._-]", "");
+
+        String objectKey = String.format(
+                "videos/%d/%d/%s-%s",
+                request.getCourseId(),
+                request.getLessonId(),
+                uuid,
+                safeName
+        );
 
         PutObjectRequest por = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(objectKey)
-                .contentType(contentType)
                 .build();
 
-        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .putObjectRequest(por)
-                .signatureDuration(PRESIGN_EXPIRY)
-                .build();
+        PutObjectPresignRequest presignRequest =
+                PutObjectPresignRequest.builder()
+                        .putObjectRequest(por)
+                        .signatureDuration(PRESIGN_EXPIRY)
+                        .build();
 
-        PresignedPutObjectRequest presigned = presigner.presignPutObject(presignRequest);
+        PresignedPutObjectRequest presigned =
+                presigner.presignPutObject(presignRequest);
 
-        return new PresignResponse(presigned.url().toString(), objectKey, 
-                Instant.now().plus(PRESIGN_EXPIRY));
+        return new PresignResponse(
+                presigned.url().toString(),
+                objectKey,
+                Instant.now().plus(PRESIGN_EXPIRY)
+        );
     }
 
     public VideoMetadata saveMetadata(VideoMetadataDto dto) {

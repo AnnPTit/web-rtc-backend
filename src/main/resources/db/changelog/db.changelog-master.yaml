@@ -8,5 +8,15 @@ databaseChangeLog:
   - include:
       file: changes/003-create-videos.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/004-create-course.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/005-create-lessons.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/006.create-assignments.yaml
+      relativeToChangelogFile: true
+
 
 
