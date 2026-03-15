@@ -9,17 +9,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
-import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -150,5 +150,29 @@ public class VideoService {
             return "";
         }
         return filename.substring(idx + 1);
+    }
+
+    public List<VideoMetadata> getListVideo(Long courseId, Long lessonId) {
+        return repository.findByCourseIdAndLessonId(courseId, lessonId);
+    }
+
+    public String generateVideoUrl(String key) {
+
+        GetObjectRequest objectRequest =
+                GetObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key)
+                        .build();
+
+        GetObjectPresignRequest presignRequest =
+                GetObjectPresignRequest.builder()
+                        .signatureDuration(Duration.ofMinutes(30))
+                        .getObjectRequest(objectRequest)
+                        .build();
+
+        PresignedGetObjectRequest presignedRequest =
+                presigner.presignGetObject(presignRequest);
+
+        return presignedRequest.url().toString();
     }
 }

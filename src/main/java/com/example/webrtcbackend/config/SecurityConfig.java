@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/me").authenticated()
                 .requestMatchers("/api/users/**").authenticated()
                 .requestMatchers("/api/videos/**").permitAll()
+                .requestMatchers("/api/courses/**").permitAll()
                 .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

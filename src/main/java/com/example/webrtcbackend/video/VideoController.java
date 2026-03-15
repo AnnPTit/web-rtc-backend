@@ -6,10 +6,9 @@ import com.example.webrtcbackend.video.dto.VideoMetadataDto;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/videos")
@@ -39,5 +38,13 @@ public class VideoController {
     public ResponseEntity<VideoMetadata> saveMetadata(@Valid @RequestBody VideoMetadataDto dto) {
         VideoMetadata saved = videoService.saveMetadata(dto);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/signed-url")
+    public Map<String, String> getSignedUrl(@RequestParam String key) {
+
+        String url = videoService.generateVideoUrl(key);
+
+        return Map.of("signedUrl", url);
     }
 }
