@@ -4,40 +4,49 @@ import com.example.webrtcbackend.user.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
 
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @NotBlank(message = "Username không được để trống")
+    @Size(min = 3, max = 50, message = "Username phải từ 3 đến 50 ký tự")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Username chỉ được chứa chữ cái, số và dấu gạch dưới")
     private String username;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be at least 6 characters")
+    @NotBlank(message = "Mật khẩu không được để trống")
+    @Size(min = 6, max = 100, message = "Mật khẩu phải có ít nhất 6 ký tự")
     private String password;
 
-    @NotBlank(message = "Full name is required")
-    @Size(max = 100, message = "Full name must not exceed 100 characters")
+    @NotBlank(message = "Xác nhận mật khẩu không được để trống")
+    private String confirmPassword;
+
+    @NotBlank(message = "Họ và tên không được để trống")
+    @Size(max = 100, message = "Họ và tên không được vượt quá 100 ký tự")
     private String fullName;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email must be valid")
-    @Size(max = 100, message = "Email must not exceed 100 characters")
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không đúng định dạng")
+    @Size(max = 100, message = "Email không được vượt quá 100 ký tự")
     private String email;
 
-    @NotNull(message = "Role is required")
-    private UserRole role;
+    // Mặc định là STUDENT nếu client không gửi
+    private UserRole role = UserRole.STUDENT;
 
     public RegisterRequest() {
     }
 
-    public RegisterRequest(String username, String password, String fullName, String email, UserRole role) {
+    public RegisterRequest(String username, String password, String confirmPassword,
+                           String fullName, String email, UserRole role) {
         this.username = username;
         this.password = password;
+        this.confirmPassword = confirmPassword;
         this.fullName = fullName;
         this.email = email;
-        this.role = role;
+        this.role = role != null ? role : UserRole.STUDENT;
     }
+
+    // ---- Getters & Setters ----
 
     public String getUsername() {
         return username;
@@ -53,6 +62,14 @@ public class RegisterRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 
     public String getFullName() {
@@ -76,7 +93,8 @@ public class RegisterRequest {
     }
 
     public void setRole(UserRole role) {
-        this.role = role;
+        this.role = role != null ? role : UserRole.STUDENT;
     }
 }
+
 

@@ -4,7 +4,9 @@ import com.example.webrtcbackend.auth.dto.AuthResponse;
 import com.example.webrtcbackend.auth.dto.LoginRequest;
 import com.example.webrtcbackend.auth.dto.RegisterRequest;
 import com.example.webrtcbackend.auth.repository.AuthRepository;
+import com.example.webrtcbackend.common.ConflictException;
 import com.example.webrtcbackend.user.User;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,23 +28,39 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (authRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username đã tồn tại");
-        }
-        if (authRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email đã tồn tại");
+        // 1. Kiểm tra mật khẩu xác nhận
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("Mật khẩu xác nhận không khớp");
         }
 
+        // 2. Kiểm tra username đã tồn tại
+        if (authRepository.existsByUsername(request.getUsername())) {
+            throw new ConflictException("Username '" + request.getUsername() + "' đã được sử dụng");
+        }
+
+        // 3. Kiểm tra email đã tồn tại
+        if (authRepository.existsByEmail(request.getEmail())) {
+            throw new ConflictException("Email '" + request.getEmail() + "' đã được đăng ký");
+        }
+
+        // 4. Tạo user mới
         User user = new User();
-        user.setUsername(request.getUsername());
+        user.setUsername(request.getUsername().trim().toLowerCase());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFullName(request.getFullName());
-        user.setEmail(request.getEmail());
+        user.setFullName(request.getFullName().trim());
+        user.setEmail(request.getEmail().trim().toLowerCase());
         user.setRole(request.getRole());
         user.setCreatedAt(Instant.now());
 
-        User savedUser = authRepository.save(user);
+        User savedUser;
+        try {
+            savedUser = authRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            // Race condition: username hoặc email bị trùng giữa check và insert
+            throw new ConflictException("Username hoặc email đã tồn tại");
+        }
 
+        // 5. Tạo JWT token
         String token = jwtService.generateToken(
                 savedUser.getUsername(),
                 savedUser.getRole().name(),
@@ -90,4 +108,3 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng"));
     }
 }
-
