@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/users/**").authenticated()
                 .requestMatchers("/api/videos/**").permitAll()
                 .requestMatchers("/api/courses/**").permitAll()
+                .requestMatchers("/api/transcriptions/**").permitAll()
                 .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

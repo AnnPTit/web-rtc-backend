@@ -1,0 +1,62 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-create-transcripts
+      author: developer
+      changes:
+        - createTable:
+            tableName: transcripts
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: assembly_transcript_id
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: video_url
+                  type: VARCHAR(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: video_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: status
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: transcript_text
+                  type: LONGTEXT
+              - column:
+                  name: error_message
+                  type: VARCHAR(2000)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: completed_at
+                  type: TIMESTAMP
+        - createIndex:
+            tableName: transcripts
+            indexName: idx_transcripts_assembly_id
+            unique: true
+            columns:
+              - column:
+                  name: assembly_transcript_id
+        - createIndex:
+            tableName: transcripts
+            indexName: idx_transcripts_video_id
+            columns:
+              - column:
+                  name: video_id

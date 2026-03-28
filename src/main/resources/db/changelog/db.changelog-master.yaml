@@ -17,6 +17,9 @@ databaseChangeLog:
   - include:
       file: changes/006.create-assignments.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/007-create-transcripts.yaml
+      relativeToChangelogFile: true
 
 
 
