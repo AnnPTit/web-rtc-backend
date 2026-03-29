@@ -8,5 +8,8 @@ import java.util.List;
 @Repository
 public interface VideoMetadataRepository extends JpaRepository<VideoMetadata, Long> {
     List<VideoMetadata> findByCourseIdAndLessonId(Long courseId, Long lessonId);
+
+    List<VideoMetadata> findByLessonId(Long lessonId);
+
     // additional query methods can be added here
 }

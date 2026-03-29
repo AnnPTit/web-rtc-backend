@@ -20,6 +20,17 @@ databaseChangeLog:
   - include:
       file: changes/007-create-transcripts.yaml
       relativeToChangelogFile: true
-
+  - include:
+      file: changes/008-alter-video-id-to-string.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/009-create-question-and-option.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/011-update-assignments.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/012-add-assignment-queue-columns.yaml
+      relativeToChangelogFile: true
 
 

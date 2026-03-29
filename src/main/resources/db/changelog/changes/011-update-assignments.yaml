@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 011-update-assignments
+      author: developer
+      changes:
+        - addColumn:
+            tableName: assignments
+            columns:
+              - column:
+                  name: status_progress
+                  type: varchar(50)
+                  defaultValue: PENDING
+              - column:
+                  name: error_message
+                  type: varchar(255)

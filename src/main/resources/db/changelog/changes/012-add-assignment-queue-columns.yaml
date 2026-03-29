@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 012-add-assignment-id-to-transcripts
+      author: developer
+      changes:
+        - addColumn:
+            tableName: transcripts
+            columns:
+              - column:
+                  name: assignment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 012-add-retry-count-to-assignments
+      author: developer
+      changes:
+        - addColumn:
+            tableName: assignments
+            columns:
+              - column:
+                  name: retry_count
+                  type: INT
+                  defaultValueNumeric: 0

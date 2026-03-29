@@ -1,12 +1,12 @@
 package com.example.webrtcbackend.transcription;
 
 import com.example.webrtcbackend.common.ApiResponse;
+import com.example.webrtcbackend.transcription.dto.QuestionsResponse;
 import com.example.webrtcbackend.transcription.dto.TranscribeRequest;
 import com.example.webrtcbackend.transcription.dto.TranscribeResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +20,11 @@ public class TranscriptionController {
 
     private final TranscriptionService transcriptionService;
 
-    public TranscriptionController(TranscriptionService transcriptionService) {
+    private final GeminiService geminiService;
+
+    public TranscriptionController(TranscriptionService transcriptionService, GeminiService geminiService) {
         this.transcriptionService = transcriptionService;
+        this.geminiService = geminiService;
     }
 
     /**
@@ -31,19 +34,11 @@ public class TranscriptionController {
      * full transcript text once transcription is complete.
      */
     @PostMapping("/transcribe-from-url")
-    public ResponseEntity<ApiResponse<TranscribeResponse>> transcribeFromUrl(
+    public ResponseEntity<ApiResponse<QuestionsResponse>> transcribeFromUrl(
             @Valid @RequestBody TranscribeRequest request) {
-
         log.info("POST /api/transcriptions/transcribe-from-url – url={}", request.getVideoUrl());
-
-        TranscribeResponse response = transcriptionService.transcribe(request);
-
-        if ("error".equals(response.getStatus())) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body(ApiResponse.error("Transcription failed: " + response.getErrorMessage()));
-        }
-
-        return ResponseEntity.ok(ApiResponse.ok("Transcription completed", response));
+        QuestionsResponse response = transcriptionService.transcribe(request);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
     /**
@@ -64,8 +59,13 @@ public class TranscriptionController {
      */
     @GetMapping("/by-video/{videoId}")
     public ResponseEntity<ApiResponse<List<TranscribeResponse>>> getByVideoId(
-            @PathVariable Long videoId) {
+            @PathVariable String videoId) {
         List<TranscribeResponse> responses = transcriptionService.getByVideoId(videoId);
         return ResponseEntity.ok(ApiResponse.ok(responses));
+    }
+
+    @PostMapping("/questions")
+    public String generate(@RequestBody String text) {
+        return geminiService.generateQuestions(text);
     }
 }

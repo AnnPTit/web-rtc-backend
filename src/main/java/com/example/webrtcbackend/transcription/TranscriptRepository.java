@@ -11,5 +11,7 @@ public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
 
     Optional<Transcript> findByAssemblyTranscriptId(String assemblyTranscriptId);
 
-    List<Transcript> findByVideoId(Long videoId);
+    List<Transcript> findByVideoId(String videoId);
+
+    List<Transcript> findByAssignmentId(Long assignmentId);
 }

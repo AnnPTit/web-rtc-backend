@@ -1,7 +1,11 @@
 package com.example.webrtcbackend.transcription;
 
+import com.example.webrtcbackend.transcription.dto.QuestionDTO;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.example.webrtcbackend.transcription.dto.QuestionsResponse;
 import com.example.webrtcbackend.transcription.dto.TranscribeRequest;
 import com.example.webrtcbackend.transcription.dto.TranscribeResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,13 +47,16 @@ public class TranscriptionService {
     private final RestTemplate restTemplate;
     private final TranscriptRepository transcriptRepository;
     private final String apiKey;
+    private final GeminiService geminiService;
 
     public TranscriptionService(RestTemplate restTemplate,
                                 TranscriptRepository transcriptRepository,
-                                @Value("${assemblyai.api-key}") String apiKey) {
+                                @Value("${assemblyai.api-key}") String apiKey,
+                                GeminiService geminiService) {
         this.restTemplate = restTemplate;
         this.transcriptRepository = transcriptRepository;
         this.apiKey = apiKey;
+        this.geminiService = geminiService;
     }
 
     // -----------------------------------------------------------------------
@@ -60,7 +67,41 @@ public class TranscriptionService {
      * Submit a video URL for transcription, poll until complete, persist the
      * result and return a {@link TranscribeResponse}.
      */
-    public TranscribeResponse transcribe(TranscribeRequest request) {
+    public QuestionsResponse transcribe(TranscribeRequest request) {
+
+        String transcribeText;
+        List<TranscribeResponse> transcribeResponseList = transcriptRepository.findByVideoId(request.getVideoId())
+                .stream()
+                .map(this::toResponse)
+                .toList();
+        if (!transcribeResponseList.isEmpty()) {
+            transcribeText = transcribeResponseList.get(0).getTranscriptText();
+        } else {
+            transcribeText = processTranscribe(request);
+        }
+
+
+        // 5. Process generated questions here
+        String rawQuestions = geminiService.generateQuestions(transcribeText);
+        if (!rawQuestions.startsWith("["))
+            throw new RuntimeException("Invalid Gemini response");
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            List<QuestionDTO> questionDTOS = mapper.readValue(
+                    rawQuestions,
+                    new TypeReference<List<QuestionDTO>>() {}
+            );
+
+            return new QuestionsResponse(questionDTOS);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse questions JSON", e);
+        }
+    }
+
+    private String processTranscribe(TranscribeRequest request) {
         log.info("Starting transcription for URL: {}", request.getVideoUrl());
 
         // 1. Submit transcription request to AssemblyAI
@@ -98,8 +139,7 @@ public class TranscriptionService {
         }
 
         entity = transcriptRepository.save(entity);
-
-        return toResponse(entity);
+        return entity.getTranscriptText();
     }
 
     /**
@@ -115,11 +155,32 @@ public class TranscriptionService {
     /**
      * Retrieve all transcripts linked to a specific video.
      */
-    public List<TranscribeResponse> getByVideoId(Long videoId) {
+    public List<TranscribeResponse> getByVideoId(String videoId) {
         return transcriptRepository.findByVideoId(videoId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    /**
+     * Transcribe a video URL for a background worker.
+     * Reuses existing transcript if available, otherwise creates a new one.
+     * Returns the transcript text.
+     */
+    public String transcribeForWorker(String videoUrl, String videoId) {
+        // Check if transcript already exists
+        List<Transcript> existing = transcriptRepository.findByVideoId(videoId);
+        if (!existing.isEmpty()) {
+            Transcript t = existing.get(0);
+            if (t.getTranscriptText() != null && !t.getTranscriptText().isBlank()) {
+                log.info("Reusing existing transcript for videoId={}", videoId);
+                return t.getTranscriptText();
+            }
+        }
+
+        // Create new transcription
+        TranscribeRequest request = new TranscribeRequest(videoUrl, videoId);
+        return processTranscribe(request);
     }
 
     // -----------------------------------------------------------------------

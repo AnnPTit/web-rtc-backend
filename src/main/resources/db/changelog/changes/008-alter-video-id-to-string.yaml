@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-alter-video-id-to-string
+      author: developer
+      changes:
+        - modifyDataType:
+            tableName: transcripts
+            columnName: video_id
+            newDataType: VARCHAR(255)

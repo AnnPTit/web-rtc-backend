@@ -30,7 +30,7 @@ public class Transcript {
      * Optional FK to the videos table.
      */
     @Column(name = "video_id")
-    private Long videoId;
+    private String videoId;
 
     /**
      * queued | processing | completed | error
@@ -49,6 +49,9 @@ public class Transcript {
 
     @Column(name = "completed_at")
     private Instant completedAt;
+
+    @Column(name = "assignment_id")
+    private Long assignmentId;
 
     public Transcript() {
     }
@@ -79,11 +82,11 @@ public class Transcript {
         this.videoUrl = videoUrl;
     }
 
-    public Long getVideoId() {
+    public String getVideoId() {
         return videoId;
     }
 
-    public void setVideoId(Long videoId) {
+    public void setVideoId(String videoId) {
         this.videoId = videoId;
     }
 
@@ -125,5 +128,13 @@ public class Transcript {
 
     public void setCompletedAt(Instant completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public Long getAssignmentId() {
+        return assignmentId;
+    }
+
+    public void setAssignmentId(Long assignmentId) {
+        this.assignmentId = assignmentId;
     }
 }

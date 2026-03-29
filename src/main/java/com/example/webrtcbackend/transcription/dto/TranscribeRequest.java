@@ -12,12 +12,12 @@ public class TranscribeRequest {
     /**
      * Optional: link the transcript to an existing VideoMetadata record.
      */
-    private Long videoId;
+    private String videoId;
 
     public TranscribeRequest() {
     }
 
-    public TranscribeRequest(String videoUrl, Long videoId) {
+    public TranscribeRequest(String videoUrl, String videoId) {
         this.videoUrl = videoUrl;
         this.videoId = videoId;
     }
@@ -30,11 +30,11 @@ public class TranscribeRequest {
         this.videoUrl = videoUrl;
     }
 
-    public Long getVideoId() {
+    public String getVideoId() {
         return videoId;
     }
 
-    public void setVideoId(Long videoId) {
+    public void setVideoId(String videoId) {
         this.videoId = videoId;
     }
 }
