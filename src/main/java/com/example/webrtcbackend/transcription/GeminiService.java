@@ -31,14 +31,14 @@ public class GeminiService {
         String prompt = """
             You are an English teacher.
 
-            Generate exactly 5 multiple-choice questionDTOS based ONLY on the text.
+            Generate exactly 10 multiple-choice questionDTOS based ONLY on the text.
 
             STRICT RULES:
             1. Output must be VALID JSON
             2. Do not wrap JSON in markdown (no ```json)
             3. Do not add any explanation
             4. Do not add text before or after JSON
-            5. Always include exactly 5 questionDTOS
+            5. Always include exactly 10 questionDTOS
             6. Each question must have 4 options (A, B, C, D)
             7. Only ONE correct answer per question
 
