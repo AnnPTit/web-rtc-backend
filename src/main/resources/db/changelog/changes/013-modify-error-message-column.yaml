@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 013-modify-error-message-column
+      author: developer
+      changes:
+        - modifyDataType:
+            tableName: assignments
+            columnName: error_message
+            newDataType: TEXT
