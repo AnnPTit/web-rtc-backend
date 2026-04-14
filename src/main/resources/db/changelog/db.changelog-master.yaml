@@ -32,5 +32,8 @@ databaseChangeLog:
   - include:
       file: changes/012-add-assignment-queue-columns.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/013-create-quiz-results.yaml
+      relativeToChangelogFile: true
 
 

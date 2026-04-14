@@ -109,7 +109,7 @@ public class AssignmentService {
             for (Option opt : questionOptions) {
                 optionsMap.put(opt.getOptionKey(), opt.getOptionValue());
             }
-            return new QuestionDTO(q.getQuestion(), optionsMap, q.getCorrectAnswer());
+            return new QuestionDTO(q.getId(),q.getQuestion(), optionsMap, q.getCorrectAnswer());
         }).toList();
     }
 

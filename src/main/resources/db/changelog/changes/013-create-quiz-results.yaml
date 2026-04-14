@@ -1,0 +1,159 @@
+databaseChangeLog:
+  - changeSet:
+      id: 013-create-quiz-results
+      author: system
+      changes:
+        - createTable:
+            tableName: quiz_results
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: assignment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_questions
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: correct_count
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: wrong_count
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: score
+                  type: DOUBLE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: duration_seconds
+                  type: INT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: completed_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: quiz_answer_details
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: quiz_result_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: question_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: selected_answer
+                  type: VARCHAR(1)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: correct_answer
+                  type: VARCHAR(1)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_correct
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: quiz_results
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_quiz_results_user
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: quiz_results
+            baseColumnNames: assignment_id
+            referencedTableName: assignments
+            referencedColumnNames: id
+            constraintName: fk_quiz_results_assignment
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: quiz_answer_details
+            baseColumnNames: quiz_result_id
+            referencedTableName: quiz_results
+            referencedColumnNames: id
+            constraintName: fk_answer_details_quiz_result
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: quiz_answer_details
+            baseColumnNames: question_id
+            referencedTableName: questions
+            referencedColumnNames: id
+            constraintName: fk_answer_details_question
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: quiz_results
+            indexName: idx_quiz_results_user_id
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            tableName: quiz_results
+            indexName: idx_quiz_results_assignment_id
+            columns:
+              - column:
+                  name: assignment_id
+
+        - createIndex:
+            tableName: quiz_results
+            indexName: idx_quiz_results_completed_at
+            columns:
+              - column:
+                  name: completed_at
+
+        - createIndex:
+            tableName: quiz_answer_details
+            indexName: idx_answer_details_quiz_result_id
+            columns:
+              - column:
+                  name: quiz_result_id
+
+        - createIndex:
+            tableName: quiz_answer_details
+            indexName: idx_answer_details_question_id
+            columns:
+              - column:
+                  name: question_id

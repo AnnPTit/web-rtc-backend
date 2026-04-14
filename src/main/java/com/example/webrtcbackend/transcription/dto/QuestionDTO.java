@@ -6,6 +6,7 @@ import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QuestionDTO {
+    private Long questionId;
     private String question;
     private Map<String, String> options;
     private String answer;
@@ -34,12 +35,21 @@ public class QuestionDTO {
         this.answer = answer;
     }
 
-    public QuestionDTO(String question, Map<String, String> options, String answer) {
+    public QuestionDTO(Long questionId, String question, Map<String, String> options, String answer) {
+        this.questionId = questionId;
         this.question = question;
         this.options = options;
         this.answer = answer;
     }
 
     public QuestionDTO() {
+    }
+
+    public Long getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
     }
 }
