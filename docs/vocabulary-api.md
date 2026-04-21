@@ -18,6 +18,10 @@
    - [Get User Stats](#6-get-user-stats)
    - [Get Favorite Words](#7-get-favorite-words)
    - [Get Review Words](#8-get-review-words)
+   - [Get All Vocabulary](#9-get-all-vocabulary)
+   - [Get Vocabulary by Date](#10-get-vocabulary-by-date)
+   - [Get Unlearned Words](#11-get-unlearned-words)
+   - [Get Learned Words](#12-get-learned-words)
 3. [Enums & Constants](#enums--constants)
 4. [Error Handling](#error-handling)
 5. [Angular Integration Examples](#angular-integration-examples)
@@ -515,6 +519,203 @@ Same format as [Get Favorite Words](#7-get-favorite-words), returning `Vocabular
 
 ---
 
+### 9. Get All Vocabulary
+
+Get all vocabulary words in the system with optional user progress.
+
+```
+GET /api/vocabulary/all?userId={userId}
+```
+
+#### Query Parameters
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `userId` | number | ❌ | If provided, includes user progress data |
+
+#### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "message": null,
+  "data": [
+    {
+      "id": 1,
+      "word": "negotiate",
+      "ipa": "/nɪˈɡoʊʃieɪt/",
+      "wordType": "verb",
+      "meaningVi": "đàm phán",
+      "meaningEn": "to discuss something to reach agreement",
+      "exampleSentence": "They negotiated a better price.",
+      "exampleVi": "Họ đã đàm phán được mức giá tốt hơn.",
+      "topic": "Business",
+      "level": "B1",
+      "createdAt": "2026-04-19T14:30:00Z",
+      "learned": false,
+      "favorite": false,
+      "needReview": false,
+      "reviewCount": 0,
+      "correctCount": 0,
+      "wrongCount": 0
+    }
+  ],
+  "timestamp": "2026-04-19T14:30:00Z"
+}
+```
+
+> **Note:** Returns all vocabulary words across all topics and levels. If `userId` is not provided, progress fields default to `false` / `0`.
+
+---
+
+### 10. Get Vocabulary by Date
+
+Get all vocabulary words created on a specific date.
+
+```
+GET /api/vocabulary/by-date?date={date}&userId={userId}
+```
+
+#### Query Parameters
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `date` | string | ✅ | Date in ISO format `YYYY-MM-DD` (e.g. `2026-04-19`) |
+| `userId` | number | ❌ | If provided, includes user progress data |
+
+#### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "message": null,
+  "data": [
+    {
+      "id": 1,
+      "word": "negotiate",
+      "ipa": "/nɪˈɡoʊʃieɪt/",
+      "wordType": "verb",
+      "meaningVi": "đàm phán",
+      "meaningEn": "to discuss something to reach agreement",
+      "exampleSentence": "They negotiated a better price.",
+      "exampleVi": "Họ đã đàm phán được mức giá tốt hơn.",
+      "topic": "Business",
+      "level": "B1",
+      "createdAt": "2026-04-19T14:30:00Z",
+      "learned": true,
+      "favorite": false,
+      "needReview": false,
+      "reviewCount": 0,
+      "correctCount": 0,
+      "wrongCount": 0
+    }
+  ],
+  "timestamp": "2026-04-19T14:30:00Z"
+}
+```
+
+> **Note:** Date is interpreted as UTC. Returns words where `createdAt` falls within the given date (00:00:00 UTC to 23:59:59 UTC).
+
+---
+
+### 11. Get Unlearned Words
+
+Get all vocabulary words that the user has **not** learned yet.
+
+```
+GET /api/vocabulary/unlearned/{userId}
+```
+
+#### Path Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `userId` | number | User ID |
+
+#### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "message": null,
+  "data": [
+    {
+      "id": 10,
+      "word": "collaborate",
+      "ipa": "/kəˈlæbəreɪt/",
+      "wordType": "verb",
+      "meaningVi": "hợp tác",
+      "meaningEn": "to work jointly with others",
+      "exampleSentence": "We need to collaborate on this project.",
+      "exampleVi": "Chúng ta cần hợp tác trong dự án này.",
+      "topic": "Business",
+      "level": "B1",
+      "createdAt": "2026-04-19T14:30:00Z",
+      "learned": false,
+      "favorite": false,
+      "needReview": false,
+      "reviewCount": 0,
+      "correctCount": 0,
+      "wrongCount": 0
+    }
+  ],
+  "timestamp": "2026-04-19T14:30:00Z"
+}
+```
+
+> **Note:** Returns all words where the user's `learnedFlag` is `false` or the user has **no progress record** for the word.
+
+---
+
+### 12. Get Learned Words
+
+Get all vocabulary words that the user has already learned.
+
+```
+GET /api/vocabulary/learned/{userId}
+```
+
+#### Path Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `userId` | number | User ID |
+
+#### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "message": null,
+  "data": [
+    {
+      "id": 5,
+      "word": "negotiate",
+      "ipa": "/nɪˈɡoʊʃieɪt/",
+      "wordType": "verb",
+      "meaningVi": "đàm phán",
+      "meaningEn": "to discuss something to reach agreement",
+      "exampleSentence": "They negotiated a better price.",
+      "exampleVi": "Họ đã đàm phán được mức giá tốt hơn.",
+      "topic": "Business",
+      "level": "B1",
+      "createdAt": "2026-04-19T14:30:00Z",
+      "learned": true,
+      "favorite": true,
+      "needReview": false,
+      "reviewCount": 5,
+      "correctCount": 4,
+      "wrongCount": 1
+    }
+  ],
+  "timestamp": "2026-04-19T14:30:00Z"
+}
+```
+
+> **Note:** Only returns words where the user's `learnedFlag = true`.
+
+---
+
 ## Enums & Constants
 
 ### Available Topics
@@ -753,6 +954,50 @@ export class VocabularyService {
       .get<ApiResponse<VocabularyWord[]>>(`${this.baseUrl}/review/${userId}`)
       .pipe(map(res => res.data));
   }
+
+  /**
+   * Get all vocabulary words with optional user progress.
+   */
+  getAllVocabulary(userId?: number): Observable<VocabularyWord[]> {
+    let params = new HttpParams();
+    if (userId) {
+      params = params.set('userId', userId.toString());
+    }
+    return this.http
+      .get<ApiResponse<VocabularyWord[]>>(`${this.baseUrl}/all`, { params })
+      .pipe(map(res => res.data));
+  }
+
+  /**
+   * Get vocabulary words by creation date with optional user progress.
+   */
+  getByDate(date: string, userId?: number): Observable<VocabularyWord[]> {
+    let params = new HttpParams().set('date', date);
+    if (userId) {
+      params = params.set('userId', userId.toString());
+    }
+    return this.http
+      .get<ApiResponse<VocabularyWord[]>>(`${this.baseUrl}/by-date`, { params })
+      .pipe(map(res => res.data));
+  }
+
+  /**
+   * Get unlearned words for a user.
+   */
+  getUnlearnedWords(userId: number): Observable<VocabularyWord[]> {
+    return this.http
+      .get<ApiResponse<VocabularyWord[]>>(`${this.baseUrl}/unlearned/${userId}`)
+      .pipe(map(res => res.data));
+  }
+
+  /**
+   * Get learned words for a user.
+   */
+  getLearnedWords(userId: number): Observable<VocabularyWord[]> {
+    return this.http
+      .get<ApiResponse<VocabularyWord[]>>(`${this.baseUrl}/learned/${userId}`)
+      .pipe(map(res => res.data));
+  }
 }
 ```
 
@@ -934,3 +1179,7 @@ export class VocabularyLearningComponent implements OnInit {
 | 6 | `GET` | `/api/vocabulary/stats/:userId` | User stats |
 | 7 | `GET` | `/api/vocabulary/favorites/:userId` | Favorites list |
 | 8 | `GET` | `/api/vocabulary/review/:userId` | Review list |
+| 9 | `GET` | `/api/vocabulary/all` | All vocabulary |
+| 10 | `GET` | `/api/vocabulary/by-date` | By creation date |
+| 11 | `GET` | `/api/vocabulary/unlearned/:userId` | Unlearned words |
+| 12 | `GET` | `/api/vocabulary/learned/:userId` | Learned words |

@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,15 @@ public interface VocabularyWordRepository extends JpaRepository<VocabularyWord, 
             @Param("topic") String topic,
             @Param("level") String level,
             @Param("excludeIds") List<Long> excludeIds);
+
+    /**
+     * Find vocabulary words created between two instants (for date filtering).
+     */
+    List<VocabularyWord> findByCreatedAtBetween(Instant from, Instant to);
+
+    /**
+     * Find vocabulary words by IDs not in the given list (for unlearned words).
+     */
+    @Query("SELECT v FROM VocabularyWord v WHERE v.id NOT IN :ids")
+    List<VocabularyWord> findByIdNotIn(@Param("ids") List<Long> ids);
 }

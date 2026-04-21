@@ -285,7 +285,106 @@ public class VocabularyService {
     }
 
     // ========================================================================
-    // 8. Get available topics
+    // 8. Get all vocabulary words (with user progress)
+    // ========================================================================
+
+    @Transactional(readOnly = true)
+    public List<VocabularyWordResponse> getAllVocabulary(Long userId) {
+        List<VocabularyWord> allWords = vocabularyWordRepository.findAll();
+
+        if (allWords.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<Long, UserVocabularyProgress> progressMap = userId != null
+                ? loadProgressMap(userId, allWords)
+                : Collections.emptyMap();
+
+        return allWords.stream()
+                .map(w -> toResponse(w, progressMap.get(w.getId())))
+                .toList();
+    }
+
+    // ========================================================================
+    // 9. Get vocabulary by date (with user progress)
+    // ========================================================================
+
+    @Transactional(readOnly = true)
+    public List<VocabularyWordResponse> getVocabularyByDate(java.time.LocalDate date, Long userId) {
+        // Convert LocalDate to Instant range (start of day → start of next day, UTC)
+        Instant startOfDay = date.atStartOfDay(java.time.ZoneOffset.UTC).toInstant();
+        Instant endOfDay = date.plusDays(1).atStartOfDay(java.time.ZoneOffset.UTC).toInstant();
+
+        List<VocabularyWord> words = vocabularyWordRepository.findByCreatedAtBetween(startOfDay, endOfDay);
+
+        if (words.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<Long, UserVocabularyProgress> progressMap = userId != null
+                ? loadProgressMap(userId, words)
+                : Collections.emptyMap();
+
+        return words.stream()
+                .map(w -> toResponse(w, progressMap.get(w.getId())))
+                .toList();
+    }
+
+    // ========================================================================
+    // 10. Get unlearned words for a user
+    // ========================================================================
+
+    @Transactional(readOnly = true)
+    public List<VocabularyWordResponse> getUnlearnedWords(Long userId) {
+        // Get IDs of words that user has already learned
+        List<Long> learnedIds = progressRepository.findLearnedVocabularyIdsByUserId(userId);
+
+        List<VocabularyWord> unlearnedWords;
+        if (learnedIds.isEmpty()) {
+            // User hasn't learned anything yet — all words are unlearned
+            unlearnedWords = vocabularyWordRepository.findAll();
+        } else {
+            unlearnedWords = vocabularyWordRepository.findByIdNotIn(learnedIds);
+        }
+
+        if (unlearnedWords.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<Long, UserVocabularyProgress> progressMap = loadProgressMap(userId, unlearnedWords);
+
+        return unlearnedWords.stream()
+                .map(w -> toResponse(w, progressMap.get(w.getId())))
+                .toList();
+    }
+
+    // ========================================================================
+    // 11. Get learned words for a user
+    // ========================================================================
+
+    @Transactional(readOnly = true)
+    public List<VocabularyWordResponse> getLearnedWords(Long userId) {
+        List<UserVocabularyProgress> learnedProgress = progressRepository.findByUserIdAndLearnedFlagTrue(userId);
+
+        if (learnedProgress.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> vocabIds = learnedProgress.stream()
+                .map(UserVocabularyProgress::getVocabularyId)
+                .toList();
+
+        Map<Long, VocabularyWord> wordMap = vocabularyWordRepository.findAllById(vocabIds).stream()
+                .collect(Collectors.toMap(VocabularyWord::getId, Function.identity()));
+
+        return learnedProgress.stream()
+                .filter(p -> wordMap.containsKey(p.getVocabularyId()))
+                .map(p -> toResponse(wordMap.get(p.getVocabularyId()), p))
+                .toList();
+    }
+
+    // ========================================================================
+    // 12. Get available topics
     // ========================================================================
 
     public List<String> getAvailableTopics() {

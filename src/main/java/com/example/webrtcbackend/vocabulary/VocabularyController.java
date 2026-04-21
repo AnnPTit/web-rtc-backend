@@ -5,9 +5,11 @@ import com.example.webrtcbackend.vocabulary.dto.*;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -153,4 +155,70 @@ public class VocabularyController {
         List<VocabularyWordResponse> reviewWords = vocabularyService.getReviewWords(userId);
         return ResponseEntity.ok(ApiResponse.ok(reviewWords));
     }
+
+    // ========================================================================
+    // 9. Get all vocabulary words
+    // ========================================================================
+
+    /**
+     * GET /api/vocabulary/all?userId={userId}
+     * Get all vocabulary words in the system with optional user progress.
+     */
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<VocabularyWordResponse>>> getAllVocabulary(
+            @RequestParam(required = false) Long userId) {
+        log.info("GET /api/vocabulary/all – userId={}", userId);
+        List<VocabularyWordResponse> words = vocabularyService.getAllVocabulary(userId);
+        return ResponseEntity.ok(ApiResponse.ok(words));
+    }
+
+    // ========================================================================
+    // 10. Get vocabulary by date
+    // ========================================================================
+
+    /**
+     * GET /api/vocabulary/by-date?date=2026-04-19&userId={userId}
+     * Get all vocabulary words created on a specific date.
+     */
+    @GetMapping("/by-date")
+    public ResponseEntity<ApiResponse<List<VocabularyWordResponse>>> getByDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Long userId) {
+        log.info("GET /api/vocabulary/by-date – date={}, userId={}", date, userId);
+        List<VocabularyWordResponse> words = vocabularyService.getVocabularyByDate(date, userId);
+        return ResponseEntity.ok(ApiResponse.ok(words));
+    }
+
+    // ========================================================================
+    // 11. Get unlearned words
+    // ========================================================================
+
+    /**
+     * GET /api/vocabulary/unlearned/{userId}
+     * Get all words that the user has NOT learned yet.
+     */
+    @GetMapping("/unlearned/{userId}")
+    public ResponseEntity<ApiResponse<List<VocabularyWordResponse>>> getUnlearnedWords(
+            @PathVariable Long userId) {
+        log.info("GET /api/vocabulary/unlearned/{}", userId);
+        List<VocabularyWordResponse> words = vocabularyService.getUnlearnedWords(userId);
+        return ResponseEntity.ok(ApiResponse.ok(words));
+    }
+
+    // ========================================================================
+    // 12. Get learned words
+    // ========================================================================
+
+    /**
+     * GET /api/vocabulary/learned/{userId}
+     * Get all words that the user has learned.
+     */
+    @GetMapping("/learned/{userId}")
+    public ResponseEntity<ApiResponse<List<VocabularyWordResponse>>> getLearnedWords(
+            @PathVariable Long userId) {
+        log.info("GET /api/vocabulary/learned/{}", userId);
+        List<VocabularyWordResponse> words = vocabularyService.getLearnedWords(userId);
+        return ResponseEntity.ok(ApiResponse.ok(words));
+    }
 }
+
