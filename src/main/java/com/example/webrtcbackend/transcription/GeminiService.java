@@ -88,6 +88,84 @@ public class GeminiService {
         return raw;
     }
 
+    /**
+     * Generate vocabulary words using Gemini AI.
+     *
+     * @param topic        the vocabulary topic (e.g. "Business", "Travel")
+     * @param level        the difficulty level (e.g. "B1", "C1")
+     * @param quantity     number of words to generate
+     * @param excludeWords words to exclude (already learned by user)
+     * @return raw JSON string of vocabulary items
+     */
+    public String generateVocabulary(String topic, String level, int quantity, List<String> excludeWords) {
+        log.info("Generating vocabulary via Gemini: topic={}, level={}, quantity={}, excludeCount={}",
+                topic, level, quantity, excludeWords.size());
+
+        String fullUrl = url + "?key=" + apiKey;
+
+        String excludeList = excludeWords.isEmpty()
+                ? "None"
+                : String.join(", ", excludeWords);
+
+        String prompt = """
+            You are an English vocabulary teacher.
+
+            Generate exactly %d English vocabulary words for the topic "%s" at difficulty level "%s".
+
+            EXCLUDE these words (already learned): %s
+
+            STRICT RULES:
+            1. Output must be VALID JSON array
+            2. Do not wrap JSON in markdown (no ```json)
+            3. Do not add any explanation or text before/after JSON
+            4. Each word must be unique and NOT in the exclude list
+            5. Level guide: A1-A2 = beginner everyday words, B1-B2 = intermediate academic/professional words, C1-C2 = advanced sophisticated words
+            6. Vietnamese meanings and translations must be accurate
+
+            JSON format:
+            [
+              {
+                "word": "negotiate",
+                "ipa": "/nɪˈɡoʊʃieɪt/",
+                "type": "verb",
+                "meaning_vi": "đàm phán",
+                "meaning_en": "to discuss something to reach agreement",
+                "example": "They negotiated a better price.",
+                "example_vi": "Họ đã đàm phán được mức giá tốt hơn."
+              }
+            ]
+            """.formatted(quantity, topic, level, excludeList);
+
+        Map<String, Object> body = Map.of(
+                "contents", List.of(
+                        Map.of(
+                                "parts", List.of(
+                                        Map.of("text", prompt)
+                                )
+                        )
+                )
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<Map> response =
+                restTemplate.exchange(fullUrl, HttpMethod.POST, request, Map.class);
+
+        String raw = extractText(response.getBody());
+
+        if (raw != null) {
+            raw = raw.replace("```json", "")
+                    .replace("```", "")
+                    .trim();
+        }
+
+        log.info("Gemini vocabulary response length: {}", raw != null ? raw.length() : 0);
+        return raw;
+    }
+
     private String extractText(Map response) {
         try {
             List candidates = (List) response.get("candidates");
@@ -105,3 +183,4 @@ public class GeminiService {
         }
     }
 }
+

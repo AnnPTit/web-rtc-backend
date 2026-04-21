@@ -35,5 +35,8 @@ databaseChangeLog:
   - include:
       file: changes/013-create-quiz-results.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/014-create-vocabulary-tables.yaml
+      relativeToChangelogFile: true
 
 

@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/transcriptions/**").permitAll()
                 .requestMatchers("/api/assignments/**").permitAll()
                 .requestMatchers("/api/quiz-results/**").permitAll()
+                .requestMatchers("/api/vocabulary/**").permitAll()
                 .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
