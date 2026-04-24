@@ -191,7 +191,7 @@ databaseChangeLog:
                   name: user_id
 
         - createIndex:
-            tableName: user_vocabulary_pr ogress
+            tableName: user_vocabulary_progress
             indexName: idx_progress_vocabulary_id
             columns:
               - column:
