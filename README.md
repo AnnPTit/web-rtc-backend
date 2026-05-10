@@ -89,3 +89,9 @@ Uploads are limited to mp4/mov/mkv files and 1 GB; URLs expire after 10 minu
 ./mvnw test
 ```
 
+## Docker build and push
+
+```powershell
+  docker buildx build --platform linux/amd64,linux/arm64 -t anptit2003/web-rtc-backend:latest --push .
+```
+
