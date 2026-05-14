@@ -38,5 +38,8 @@ databaseChangeLog:
   - include:
       file: changes/014-create-vocabulary-tables.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/015-add-new-user-and-course-level.yaml
+      relativeToChangelogFile: true
 
 

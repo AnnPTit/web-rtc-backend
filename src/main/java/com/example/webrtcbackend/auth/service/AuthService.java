@@ -51,6 +51,7 @@ public class AuthService {
         user.setEmail(request.getEmail().trim().toLowerCase());
         user.setRole(request.getRole());
         user.setCreatedAt(Instant.now());
+        user.setNewUser(true);
 
         User savedUser;
         try {
@@ -73,11 +74,12 @@ public class AuthService {
                 savedUser.getUsername(),
                 savedUser.getFullName(),
                 savedUser.getEmail(),
-                savedUser.getRole()
+                savedUser.getRole(),
+                savedUser.isNewUser()
         );
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         User user = authRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("Username hoặc mật khẩu không đúng"));
@@ -92,13 +94,23 @@ public class AuthService {
                 user.getId()
         );
 
+        // Lưu trạng thái isNewUser trước khi cập nhật
+        boolean wasNewUser = user.isNewUser();
+
+        // Sau lần đăng nhập đầu tiên, set isNewUser = false
+        if (user.isNewUser()) {
+            user.setNewUser(false);
+            authRepository.save(user);
+        }
+
         return new AuthResponse(
                 token,
                 user.getId(),
                 user.getUsername(),
                 user.getFullName(),
                 user.getEmail(),
-                user.getRole()
+                user.getRole(),
+                wasNewUser
         );
     }
 

@@ -73,7 +73,8 @@ public class AuthController {
                 user.getUsername(),
                 user.getFullName(),
                 user.getEmail(),
-                user.getRole()
+                user.getRole(),
+                user.isNewUser()
         ));
     }
 }

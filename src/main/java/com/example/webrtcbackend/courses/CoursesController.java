@@ -30,13 +30,13 @@ public class CoursesController {
 
     @PostMapping("/create")
     public ResponseEntity<Courses> create(@RequestBody CourseDTO request) {
-        Courses results = courseService.createCourse(request.getTitle(), request.getDescription());
+        Courses results = courseService.createCourse(request.getTitle(), request.getDescription(), request.getLevel());
         return ResponseEntity.ok(results);
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Courses> update(@RequestBody CourseDTO request, @PathVariable Long id) {
-        Courses results = courseService.updateCourse(id, request.getTitle(), request.getDescription());
+        Courses results = courseService.updateCourse(id, request.getTitle(), request.getDescription(), request.getLevel());
         return ResponseEntity.ok(results);
     }
 

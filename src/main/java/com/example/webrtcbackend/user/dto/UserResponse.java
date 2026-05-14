@@ -11,14 +11,16 @@ public class UserResponse {
     private String email;
     private UserRole role;
     private Instant createdAt;
+    private boolean isNewUser;
 
-    public UserResponse(Long id, String username, String fullName, String email, UserRole role, Instant createdAt) {
+    public UserResponse(Long id, String username, String fullName, String email, UserRole role, Instant createdAt, boolean isNewUser) {
         this.id = id;
         this.username = username;
         this.fullName = fullName;
         this.email = email;
         this.role = role;
         this.createdAt = createdAt;
+        this.isNewUser = isNewUser;
     }
 
     public Long getId() {
@@ -43,6 +45,10 @@ public class UserResponse {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isNewUser() {
+        return isNewUser;
     }
 }
 

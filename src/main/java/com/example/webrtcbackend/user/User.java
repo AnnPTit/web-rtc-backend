@@ -37,10 +37,13 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Column(name = "is_new_user", nullable = false)
+    private boolean isNewUser = true;
+
     public User() {
     }
 
-    public User(Long id, String username, String password, String fullName, String email, UserRole role, Instant createdAt) {
+    public User(Long id, String username, String password, String fullName, String email, UserRole role, Instant createdAt, boolean isNewUser) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -48,6 +51,7 @@ public class User {
         this.email = email;
         this.role = role;
         this.createdAt = createdAt;
+        this.isNewUser = isNewUser;
     }
 
     public Long getId() {
@@ -104,6 +108,14 @@ public class User {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isNewUser() {
+        return isNewUser;
+    }
+
+    public void setNewUser(boolean newUser) {
+        isNewUser = newUser;
     }
 }
 

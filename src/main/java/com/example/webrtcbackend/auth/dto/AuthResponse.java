@@ -11,17 +11,19 @@ public class AuthResponse {
     private String fullName;
     private String email;
     private UserRole role;
+    private boolean isNewUser;
 
     public AuthResponse() {
     }
 
-    public AuthResponse(String token, Long userId, String username, String fullName, String email, UserRole role) {
+    public AuthResponse(String token, Long userId, String username, String fullName, String email, UserRole role, boolean isNewUser) {
         this.token = token;
         this.userId = userId;
         this.username = username;
         this.fullName = fullName;
         this.email = email;
         this.role = role;
+        this.isNewUser = isNewUser;
     }
 
     public String getToken() {
@@ -78,6 +80,14 @@ public class AuthResponse {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public boolean isNewUser() {
+        return isNewUser;
+    }
+
+    public void setNewUser(boolean newUser) {
+        isNewUser = newUser;
     }
 }
 

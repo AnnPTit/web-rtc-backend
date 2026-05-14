@@ -7,6 +7,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
+import com.example.webrtcbackend.courses.entity.CourseLevel;
+
 @Entity
 @Table(name = "courses")
 public class Courses {
@@ -28,6 +30,10 @@ public class Courses {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "level", nullable = false, length = 20)
+    private CourseLevel level = CourseLevel.BEGINNER;
 
     public Long getId() {
         return id;
@@ -69,14 +75,23 @@ public class Courses {
         this.updatedAt = updatedAt;
     }
 
-    public Courses(Long id, String title, String description, Instant createdAt, Instant updatedAt) {
+    public Courses(Long id, String title, String description, Instant createdAt, Instant updatedAt, CourseLevel level) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.level = level;
     }
 
     public Courses() {
+    }
+
+    public CourseLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(CourseLevel level) {
+        this.level = level;
     }
 }

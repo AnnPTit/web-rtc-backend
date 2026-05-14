@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: 015-add-is-new-user-column
+      author: developer
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: is_new_user
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropColumn:
+            tableName: users
+            columnName: is_new_user
+
+  - changeSet:
+      id: 015-add-course-level-column
+      author: developer
+      changes:
+        - addColumn:
+            tableName: courses
+            columns:
+              - column:
+                  name: level
+                  type: VARCHAR(20)
+                  defaultValue: BEGINNER
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: courses
+            indexName: idx_courses_level
+            columns:
+              - column:
+                  name: level
+      rollback:
+        - dropIndex:
+            tableName: courses
+            indexName: idx_courses_level
+        - dropColumn:
+            tableName: courses
+            columnName: level
