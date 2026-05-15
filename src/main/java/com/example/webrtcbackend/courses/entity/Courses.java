@@ -35,6 +35,9 @@ public class Courses {
     @Column(name = "level", nullable = false, length = 20)
     private CourseLevel level = CourseLevel.BEGINNER;
 
+    @Column(name = "lecturer_id")
+    private Long lecturerId;
+
     public Long getId() {
         return id;
     }
@@ -75,13 +78,14 @@ public class Courses {
         this.updatedAt = updatedAt;
     }
 
-    public Courses(Long id, String title, String description, Instant createdAt, Instant updatedAt, CourseLevel level) {
+    public Courses(Long id, String title, String description, Instant createdAt, Instant updatedAt, CourseLevel level, Long lecturerId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.level = level;
+        this.lecturerId = lecturerId;
     }
 
     public Courses() {
@@ -93,5 +97,13 @@ public class Courses {
 
     public void setLevel(CourseLevel level) {
         this.level = level;
+    }
+
+    public Long getLecturerId() {
+        return lecturerId;
+    }
+
+    public void setLecturerId(Long lecturerId) {
+        this.lecturerId = lecturerId;
     }
 }

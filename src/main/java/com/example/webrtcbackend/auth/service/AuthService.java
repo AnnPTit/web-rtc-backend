@@ -33,6 +33,11 @@ public class AuthService {
             throw new IllegalArgumentException("Mật khẩu xác nhận không khớp");
         }
 
+        // 1.5 Block ADMIN self-registration
+        if (request.getRole() == com.example.webrtcbackend.user.UserRole.ADMIN) {
+            throw new IllegalArgumentException("Không thể tự đăng ký tài khoản ADMIN");
+        }
+
         // 2. Kiểm tra username đã tồn tại
         if (authRepository.existsByUsername(request.getUsername())) {
             throw new ConflictException("Username '" + request.getUsername() + "' đã được sử dụng");

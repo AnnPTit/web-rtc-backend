@@ -41,5 +41,8 @@ databaseChangeLog:
   - include:
       file: changes/015-add-new-user-and-course-level.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/016-add-admin-role-and-lecturer-id.yaml
+      relativeToChangelogFile: true
 
 

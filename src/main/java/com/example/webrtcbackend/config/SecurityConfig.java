@@ -38,9 +38,22 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/me").authenticated()
-                .requestMatchers("/api/users/**").authenticated()
-                .requestMatchers("/api/videos/**").permitAll()
-                .requestMatchers("/api/courses/**").permitAll()
+                // User management: ADMIN only
+                .requestMatchers("/api/users/**").hasRole("ADMIN")
+                // Course write operations: LECTURER or ADMIN (ownership enforced in service layer)
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/courses/**").hasAnyRole("LECTURER", "ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/courses/**").hasAnyRole("LECTURER", "ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/courses/**").hasAnyRole("LECTURER", "ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/courses/**").permitAll()
+                // Lesson write operations: LECTURER or ADMIN
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/lessons/**").hasAnyRole("LECTURER", "ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/lessons/**").hasAnyRole("LECTURER", "ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/lessons/**").hasAnyRole("LECTURER", "ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/lessons/**").permitAll()
+                // Video write operations: LECTURER or ADMIN
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/videos/**").hasAnyRole("LECTURER", "ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/videos/**").permitAll()
+                // Other endpoints
                 .requestMatchers("/api/transcriptions/**").permitAll()
                 .requestMatchers("/api/assignments/**").permitAll()
                 .requestMatchers("/api/quiz-results/**").permitAll()

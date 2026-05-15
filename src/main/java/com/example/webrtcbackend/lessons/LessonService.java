@@ -1,7 +1,9 @@
 package com.example.webrtcbackend.lessons;
 
+import com.example.webrtcbackend.courses.CourseService;
 import com.example.webrtcbackend.courses.entity.Courses;
 import com.example.webrtcbackend.lessons.entity.Lessons;
+import com.example.webrtcbackend.user.UserRole;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,12 +11,21 @@ import java.util.List;
 @Service
 public class LessonService {
     private final LessonRepository lessonRepository;
+    private final CourseService courseService;
 
-    public LessonService(LessonRepository lessonRepository) {
+    public LessonService(LessonRepository lessonRepository, CourseService courseService) {
         this.lessonRepository = lessonRepository;
+        this.courseService = courseService;
     }
 
-    public Lessons createLesson(Long courseId, String title, String description) {
+    /**
+     * Create a lesson. Verifies the user owns the parent course (or is ADMIN).
+     */
+    public Lessons createLesson(Long courseId, String title, String description,
+                                Long currentUserId, UserRole currentUserRole) {
+        Courses course = courseService.getCourseById(courseId);
+        courseService.verifyOwnership(course, currentUserId, currentUserRole);
+
         Lessons lesson = new Lessons();
         lesson.setCourseId(courseId);
         lesson.setTitle(title);
@@ -27,15 +38,27 @@ public class LessonService {
         return lessonRepository.findById(id).orElseThrow(() -> new RuntimeException("Lesson not found with id: " + id));
     }
 
-    public Lessons updateLesson(Long id, String title, String content) {
+    /**
+     * Update a lesson. Verifies ownership via parent course.
+     */
+    public Lessons updateLesson(Long id, String title, String content,
+                                Long currentUserId, UserRole currentUserRole) {
         Lessons lesson = getLessonById(id);
+        Courses course = courseService.getCourseById(lesson.getCourseId());
+        courseService.verifyOwnership(course, currentUserId, currentUserRole);
+
         lesson.setTitle(title);
         lesson.setDescription(content);
         return lessonRepository.save(lesson);
     }
 
-    public void deleteLesson(Long id) {
+    /**
+     * Delete a lesson. Verifies ownership via parent course.
+     */
+    public void deleteLesson(Long id, Long currentUserId, UserRole currentUserRole) {
         Lessons lesson = getLessonById(id);
+        Courses course = courseService.getCourseById(lesson.getCourseId());
+        courseService.verifyOwnership(course, currentUserId, currentUserRole);
         lessonRepository.delete(lesson);
     }
 

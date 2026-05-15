@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: 016-add-lecturer-id-to-courses
+      author: antigravity
+      comment: "Add lecturer_id column to courses table for resource-level authorization"
+      changes:
+        - addColumn:
+            tableName: courses
+            columns:
+              - column:
+                  name: lecturer_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+
+        - addForeignKeyConstraint:
+            baseTableName: courses
+            baseColumnNames: lecturer_id
+            constraintName: fk_courses_lecturer_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        - createIndex:
+            tableName: courses
+            indexName: idx_courses_lecturer_id
+            columns:
+              - column:
+                  name: lecturer_id
+
+  - changeSet:
+      id: 016-assign-old-courses-to-first-lecturer
+      author: antigravity
+      comment: "Assign existing courses (without lecturer_id) to the first LECTURER user"
+      changes:
+        - sql:
+            sql: >
+              UPDATE courses
+              SET lecturer_id = (
+                SELECT id FROM users WHERE role = 'LECTURER' ORDER BY id ASC LIMIT 1
+              )
+              WHERE lecturer_id IS NULL
