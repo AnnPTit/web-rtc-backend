@@ -3,6 +3,8 @@ package com.example.webrtcbackend.transcription;
 import com.example.webrtcbackend.common.ApiResponse;
 import com.example.webrtcbackend.transcription.dto.AssignmentResponse;
 import com.example.webrtcbackend.transcription.dto.CreateAssignmentRequest;
+import com.example.webrtcbackend.transcription.dto.QuestionDTO;
+import com.example.webrtcbackend.transcription.dto.UpdateQuestionRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +27,15 @@ public class AssignmentController {
 
     /**
      * POST /api/assignments
-     * Create a new assignment and queue it for async processing.
+     * Create a new assignment — synchronously transcribes video and generates questions.
+     * This is a blocking call that may take 1-5 minutes.
      */
     @PostMapping
     public ResponseEntity<ApiResponse<AssignmentResponse>> createAssignment(
             @Valid @RequestBody CreateAssignmentRequest request) {
         log.info("POST /api/assignments – lessonId={}, title='{}'", request.getLessonId(), request.getTitle());
         AssignmentResponse response = assignmentService.createAssignment(request);
-        return ResponseEntity.ok(ApiResponse.ok("Assignment created and queued for processing", response));
+        return ResponseEntity.ok(ApiResponse.ok("Assignment created", response));
     }
 
     /**
@@ -56,5 +59,32 @@ public class AssignmentController {
         log.info("GET /api/assignments/by-lesson/{}", lessonId);
         List<AssignmentResponse> responses = assignmentService.getAssignmentsByLessonId(lessonId);
         return ResponseEntity.ok(ApiResponse.ok(responses));
+    }
+
+    /**
+     * PUT /api/assignments/{assignmentId}/questions/{questionId}
+     * Update a question's text, correct answer, and options.
+     */
+    @PutMapping("/{assignmentId}/questions/{questionId}")
+    public ResponseEntity<ApiResponse<QuestionDTO>> updateQuestion(
+            @PathVariable Long assignmentId,
+            @PathVariable Long questionId,
+            @Valid @RequestBody UpdateQuestionRequest request) {
+        log.info("PUT /api/assignments/{}/questions/{}", assignmentId, questionId);
+        QuestionDTO updated = assignmentService.updateQuestion(assignmentId, questionId, request);
+        return ResponseEntity.ok(ApiResponse.ok("Question updated", updated));
+    }
+
+    /**
+     * DELETE /api/assignments/{assignmentId}/questions/{questionId}
+     * Delete a question and its options.
+     */
+    @DeleteMapping("/{assignmentId}/questions/{questionId}")
+    public ResponseEntity<ApiResponse<Void>> deleteQuestion(
+            @PathVariable Long assignmentId,
+            @PathVariable Long questionId) {
+        log.info("DELETE /api/assignments/{}/questions/{}", assignmentId, questionId);
+        assignmentService.deleteQuestion(assignmentId, questionId);
+        return ResponseEntity.ok(ApiResponse.ok("Question deleted", null));
     }
 }

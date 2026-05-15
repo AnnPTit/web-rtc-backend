@@ -1,7 +1,11 @@
 package com.example.webrtcbackend.courses;
 
+import com.example.webrtcbackend.auth.repository.AuthRepository;
+import com.example.webrtcbackend.courses.dto.CourseDetailDTO;
 import com.example.webrtcbackend.courses.entity.CourseLevel;
 import com.example.webrtcbackend.courses.entity.Courses;
+import com.example.webrtcbackend.lessons.LessonRepository;
+import com.example.webrtcbackend.user.User;
 import com.example.webrtcbackend.user.UserRole;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -11,9 +15,15 @@ import java.util.List;
 @Service
 public class CourseService {
     private final CoursesRepository coursesRepository;
+    private final LessonRepository lessonRepository;
+    private final AuthRepository authRepository;
 
-    public CourseService(CoursesRepository coursesRepository) {
+    public CourseService(CoursesRepository coursesRepository,
+                         LessonRepository lessonRepository,
+                         AuthRepository authRepository) {
         this.coursesRepository = coursesRepository;
+        this.lessonRepository = lessonRepository;
+        this.authRepository = authRepository;
     }
 
     /**
@@ -31,6 +41,14 @@ public class CourseService {
     public Courses getCourseById(Long id) {
         return coursesRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+    }
+
+    /**
+     * Get a single course as CourseDetailDTO (with lessonCount and lecturerName).
+     */
+    public CourseDetailDTO getCourseDetailById(Long id) {
+        Courses course = getCourseById(id);
+        return toCourseDetailDTO(course);
     }
 
     /**
@@ -80,6 +98,30 @@ public class CourseService {
     }
 
     /**
+     * Search courses and return as CourseDetailDTO (enriched with lessonCount and lecturerName).
+     */
+    public List<CourseDetailDTO> searchCoursesWithDetails(String query, Long currentUserId, UserRole currentUserRole) {
+        List<Courses> courses = searchCourses(query, currentUserId, currentUserRole);
+        return courses.stream()
+                .map(this::toCourseDetailDTO)
+                .toList();
+    }
+
+    /**
+     * Convert a Courses entity to CourseDetailDTO by looking up lesson count and lecturer name.
+     */
+    private CourseDetailDTO toCourseDetailDTO(Courses course) {
+        int lessonCount = (int) lessonRepository.countByCourseId(course.getId());
+        String lecturerName = null;
+        if (course.getLecturerId() != null) {
+            lecturerName = authRepository.findById(course.getLecturerId())
+                    .map(User::getFullName)
+                    .orElse(null);
+        }
+        return new CourseDetailDTO(course, lessonCount, lecturerName);
+    }
+
+    /**
      * Verify that the current user owns the course, or is an ADMIN.
      */
     public void verifyOwnership(Courses course, Long currentUserId, UserRole currentUserRole) {
@@ -91,3 +133,4 @@ public class CourseService {
         }
     }
 }
+

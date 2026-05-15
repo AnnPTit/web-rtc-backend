@@ -2,6 +2,7 @@ package com.example.webrtcbackend.courses;
 
 import com.example.webrtcbackend.auth.repository.AuthRepository;
 import com.example.webrtcbackend.courses.dto.CourseDTO;
+import com.example.webrtcbackend.courses.dto.CourseDetailDTO;
 import com.example.webrtcbackend.courses.entity.Courses;
 import com.example.webrtcbackend.user.User;
 import com.example.webrtcbackend.user.UserRole;
@@ -31,21 +32,21 @@ public class CoursesController {
      * even when a valid JWT is present.
      */
     @GetMapping("/search")
-    public ResponseEntity<List<Courses>> searchCourses(
+    public ResponseEntity<List<CourseDetailDTO>> searchCourses(
             @RequestParam(value = "query", required = false) String query) {
         User user = resolveCurrentUser();
         if (user == null) {
             // Not authenticated — public access, return all courses
-            List<Courses> results = courseService.searchCourses(query, null, UserRole.STUDENT);
+            List<CourseDetailDTO> results = courseService.searchCoursesWithDetails(query, null, UserRole.STUDENT);
             return ResponseEntity.ok(results);
         }
-        List<Courses> results = courseService.searchCourses(query, user.getId(), user.getRole());
+        List<CourseDetailDTO> results = courseService.searchCoursesWithDetails(query, user.getId(), user.getRole());
         return ResponseEntity.ok(results);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Courses> findById(@PathVariable(value = "id") Long id) {
-        Courses results = courseService.getCourseById(id);
+    public ResponseEntity<CourseDetailDTO> findById(@PathVariable(value = "id") Long id) {
+        CourseDetailDTO results = courseService.getCourseDetailById(id);
         return ResponseEntity.ok(results);
     }
 
